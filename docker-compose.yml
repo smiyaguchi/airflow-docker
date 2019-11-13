@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+    
+    webserver:
+        image: airflow-local:0.1
+        depends_on:
+            - postgres
+        environment:
+            - LOAC_EX=n
+            - EXECUTOR=Local
+        volumes:
+            - ./dag:/usr/local/airflow/dag
+        ports:
+            - "8080:8080"
+        command: webserver
