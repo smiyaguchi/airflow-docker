@@ -8,14 +8,15 @@ services:
             - POSTGRES_DB=airflow
     
     webserver:
-        image: airflow-local:0.1
+        image: airflow-local:0.2
+        restart: always
         depends_on:
             - postgres
         environment:
             - LOAC_EX=n
             - EXECUTOR=Local
         volumes:
-            - ./dag:/usr/local/airflow/dag
+            - ./dags:/usr/local/airflow/dags
         ports:
             - "8080:8080"
         command: webserver

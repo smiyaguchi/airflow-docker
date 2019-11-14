@@ -3,19 +3,32 @@ FROM python:3.7-slim-stretch
 ENV DEBIAN_FRONTEND noninteractive
 
 ARG AIRFLOW_VERSION=1.10.4
-ARG AIRFLOW_HOME=/usr/local/airflow
+ARG AIRFLOW_USER_HOME=/usr/local/airflow
+ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
 RUN set -x \
     && apt-get update \
-    && apt-get install -y apt-utils \
-                          build-essential \
+    && apt-get install -y --no-install-recommends \
+        apt-utils \
+        build-essential \
+    && useradd -ms /bin/bash -d ${AIRFLOW_USER_HOME} airflow \
     && pip install -U marshmallow \
-    && pip install grpc-google-iam-v1==0.12.0 \
+    && pip install grpc-google-iam-v1==0.11.4 \
     && pip install apache-airflow[postgres,gcp]==${AIRFLOW_VERSION} \
     && pip install 'redis==3.2' \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR ${AIRFLOW_HOME}
+COPY script/entrypoint.sh ${AIRFLOW_USER_HOME}/entrypoint.sh
+COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 
-ENTRYPOINT ["airflow"]
+RUN chown -R airflow:airflow ${AIRFLOW_USER_HOME}
+RUN chmod +x ${AIRFLOW_USER_HOME}/entrypoint.sh
+
+EXPOSE 8080 5555 8793
+
+USER airflow
+WORKDIR ${AIRFLOW_USER_HOME}
+
+ENTRYPOINT ["/usr/local/airflow/entrypoint.sh"]
 CMD ["webserver"]
