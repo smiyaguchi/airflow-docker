@@ -15,8 +15,9 @@ services:
         environment:
             - LOAC_EX=n
             - EXECUTOR=Local
+            - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
         volumes:
             - ./dags:/usr/local/airflow/dags
         ports:
-            - "8080:8080"
+            - "9000:8080"
         command: webserver
