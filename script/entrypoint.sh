@@ -3,15 +3,18 @@
 : "${POSTGRES_HOST:="postgres"}"
 : "${POSTGRES_PORT:="5432"}"
 : "${POSTGRES_USER:="airflow"}"
+: "${POSTGRES_PASSWORD:="airflow"}"
 : "${POSTGRES_DB:="airflow"}"
 
 : "${AIRFLOW_HOME:="/usr/local/airflow"}"
+: "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptgraphy.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 : "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Local}Executor}"
 
 export \
     AIRFLOW_HOME \
     AIRFLOW__CELERY__RESULT_BACKEND \
     AIRFLOW__CORE__EXECUTOR \
+    AIRFLOW__CORE__FERNET_KEY \
     AIRFLOW__CORE__LOAD_EXAMPLES \
     AIRFLOW__CORE__SQL_ALCHEMY_CONN \
 
@@ -39,7 +42,7 @@ AIRFLOW__CELERY__RESULT_BACKEND="db+postgresql://$POSTGRES_USER:$POSTGRES_PASSWO
 wait_for_port "Postgres" "$POSTGRES_HOST" "$POSTGRES_PORT"
 
 case "$1" in
-    webserer)
+    webserver)
         airflow initdb
         airflow scheduler &
         exec airflow webserver
