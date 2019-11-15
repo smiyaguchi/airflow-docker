@@ -15,7 +15,7 @@ services:
         environment:
             - LOAC_EX=n
             - EXECUTOR=Local
-            - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+            - GOOGLE_APPLICATION_CREDENTIALS=${GCP_CRED}
         volumes:
             - ./dags:/usr/local/airflow/dags
         ports:
